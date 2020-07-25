@@ -9,6 +9,7 @@ STATUS = (
 )
 
 class Status(models.Model):
+    user_id = models.CharField(max_length = 80, null = True)
     Title = models.CharField(max_length = 80)
     img = models.ImageField(upload_to = 'pics/')
     desc = models.TextField()
