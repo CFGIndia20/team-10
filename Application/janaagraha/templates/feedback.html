@@ -10,7 +10,7 @@
 
         {% csrf_token %}
          
-        {% if stat == 4 %} 
+        {% if stat == 'resolved' %} 
 
         Your issue has been resolved
         <br><br>
@@ -19,11 +19,20 @@
         
         {% else %}
 
-        Description: <input type="text" name="desc">
+        <!-- <label for="categ">Choose a category:</label>
+
+            <select name="cat" id="cat">
+            <option value="garbage">Garbage</option>
+            <option value="potholes">Pot Holes</option>
+            <option value="Fire">Fire</option>
+            <option value="waterlogging">Water Logging</option>
+        </select> -->
+        Description: <input type="text" name="desc" value="{{stats.desc}}">
         <br><br>
-        Location: <input type="text" name="loct">
+        <img src="{{stats.img.url}}" alt="">
+        Location: <input type="text" name="loct" value="{{stats.location}}">
         <br><br>
-        Status: <input type="text" name="status" placeholder="">
+        Status: <input type="text" name="status" value="{{stats.stat}}">
         <!-- {{status}} -->
         <br><br>
         <input type="submit">
