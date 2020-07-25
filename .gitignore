@@ -4,3 +4,5 @@ Team*.zip
 *.crt
 *.key
 *.ovpn
+secret.py
+venv
