@@ -1,7 +1,8 @@
 from django.shortcuts import render,HttpResponse,get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from services import fetchFromTwitter
+from services import fetchFromTwitter,location
+# from . import classification
 import json
 from .models import Complaints
 from .forms import ComplaintsForm
@@ -26,8 +27,18 @@ class TwitterComplaints(APIView):
                     data['media_url'] = comp['extended_entities']['media'][0]['media_url']
             else :
                 data['media_url'] = None
+            data['location'] = location.return_location(data['text'])
+            data['category_id'] = getCategory(data['text'])
             response.append(data)      
         return Response(response)
+
+class categorization(APIView):
+    def get(self, request, format=None):
+        data={
+            'category_id':getCategory(request.query_params.get('slug'))
+        }
+        return Response(data)
+
 
 @method_decorator(login_required, name='dispatch')
 class ComplaintsView(View):
@@ -45,6 +56,7 @@ class ComplaintsView(View):
         if form.is_valid():
             print("enter")
             form = form.save(commit=False)
+            form.categories = getCategory(form.Topic)
             form.user = request.user
             form.save()
             return HttpResponse('Success')
@@ -66,5 +78,22 @@ def shareUrl(request,id):
         }
         form = ComplaintsForm(initial=data)
         return render(request, 'feedback.html', {'form':form,'stats':status})
+
+
+import pickle
+import numpy as np
+from sklearn.svm import LinearSVC
+
+def getCategory(text):
+    modelling = LinearSVC()
+    filename = 'C:\\Users\\Smit\\Documents\\GitHub\\team-10\\Application\\janaagraha\\complaints\\classify.pkl'
+    with open(filename, 'rb') as f:
+        modelling.clf = pickle.load(f)
+    filename1 = 'C:\\Users\\Smit\\Documents\\GitHub\\team-10\\Application\\janaagraha\\complaints\\tfidf_pre.pkl'
+    with open(filename1, 'rb') as f:
+        modelling.vectorizer = pickle.load(f)
+    print(modelling)
+    resp = modelling.clf.predict(modelling.vectorizer.transform([text]))
+    return resp
     
 
