@@ -10,7 +10,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'status.apps.StatusConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -19,6 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'complaints',
+    'account',
 ]
 
 MIDDLEWARE = [
@@ -112,3 +112,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny'
     ]
 }
+
+LOGIN_REDIRECT_URL = 'account:dashboard'
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'

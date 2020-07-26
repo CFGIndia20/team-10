@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load custom_tags %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+    <div class="card"> 
+        <div class="card-body">
+            <h1>Create an account</h1>
+            <hr>
+            <br>
+            <p>Please, sign up using the following form:</p>
+            <form action="." method="POST">
+                {% csrf_token %}
+                {% for feild in user_form %}
+                <div class="form-group">
+                    {{ feild.label_tag }}
+                    {{ feild|add_classes:'form-control' }}
+                </div>
+            {% endfor %}
+
+                <p><input type="submit" class="btn btn-primary" value="Create my account"></p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

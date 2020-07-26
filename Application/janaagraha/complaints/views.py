@@ -1,8 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponse,get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from services import fetchFromTwitter
 import json
+from .models import Complaints
+from .forms import ComplaintsForm
+from django.views.generic import View
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 # Create your views here
 class TwitterComplaints(APIView):
     def get(self, request, format=None):
@@ -20,7 +26,45 @@ class TwitterComplaints(APIView):
                     data['media_url'] = comp['extended_entities']['media'][0]['media_url']
             else :
                 data['media_url'] = None
-            response.append(data)
+            response.append(data)      
         return Response(response)
+
+@method_decorator(login_required, name='dispatch')
+class ComplaintsView(View):
+    
+    def get(self, request, *args, **kwargs):
+        form = ComplaintsForm()
+        return render(request,'complaints/complain.html',{'form':form})
+
+    def post(self, request, *args, **kwargs):
+        form = ComplaintsForm(request.POST)
+        print(form)
+        form.non_field_errors()
+        field_errors = [ (field.label, field.errors) for field in form] 
+        print(field_errors)
+        if form.is_valid():
+            print("enter")
+            form = form.save(commit=False)
+            form.user = request.user
+            form.save()
+            return HttpResponse('Success')
+        return render(request,'complaints/complain.html',{'form':form})
+
+
+def shareUrl(request,id):
+    complain = get_object_or_404(Complaints,id=id)
+    status = complain.statuses.all().order_by('-created').reverse()
+    statobj = status[0]
+
+    if statobj.stat == "resolved":
+        return render(request,'complaints/feedback.html',{})
+    else:
+        data = {
+            'Topic':complain.Topic,
+            'categories':complain.categories,
+            'location':complain.location
+        }
+        form = ComplaintsForm(initial=data)
+        return render(request, 'feedback.html', {'form':form,'stats':status})
     
 

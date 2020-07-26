@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block title %}Log-in{% endblock %}
+
+{% block content %}
+    <div class="card mt-5" >
+        <div class="card-body"> 
+        <h3>Lodge Complain</h3>
+        <hr>
+        <br>
+            <form method="POST" action="">
+                {% csrf_token %}
+                {{ form.errors }}
+                {% for feild in form %}
+                    <div class="form-group">
+                        {{ feild.label_tag }}
+                        {{ feild|add_classes:'form-control' }}
+                    </div>
+                {% endfor %}
+                <!-- {{form.as_p}} -->
+                <input type="submit" class="btn btn-success float-right" value="Complain">
+            </form>
+        </div>
+    </div>
+{% endblock %}
